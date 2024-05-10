@@ -4,10 +4,6 @@ const Merchants = require("../../models/merchant");
 exports.createMerchant = async (req, res) => {
   const data = req.body;
 
-  console.log("-------------------");
-  console.log("req.files", req.files);
-  console.log("-------------------");
-
   let logoURL = null;
   let menuImages = null;
   let images = [];
