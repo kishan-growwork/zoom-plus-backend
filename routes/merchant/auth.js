@@ -10,7 +10,7 @@ const {
   me,
   registerUserGoogle,
   checkIsRegisterGoogleUser,
-} = require("../../controllers/user/auth");
+} = require("../../controllers/merchant/auth");
 const { validate } = require("../../helper/helper");
 const { body } = require("express-validator");
 const { verifyAuth, verifyGoogleUser } = require("../../middleware/auth");
