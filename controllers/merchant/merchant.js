@@ -41,7 +41,13 @@ exports.createMerchant = async (req, res) => {
 
   //   successResponse(res, { data: data }, "Merchant create successfully");
 
-  await Merchants.create({ ...data, images: images, menuImages, logo: logoURL })
+  await Merchants.create({
+    ...data,
+    images: images,
+    menuImages,
+    logo: logoURL,
+    userId: req?.user?.uid,
+  })
     .then((response) => {
       successResponse(res, { data: response }, "Merchant create successfully");
     })

@@ -142,6 +142,7 @@ exports.registerUser = async (req, res) => {
 exports.registerUserGoogle = async (req, res) => {
   try {
     let findRole = await getRoleIdByName("merchant");
+
     if (findRole.status) {
       let userData = {
         provider_uid: req?.user?.sub,

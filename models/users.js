@@ -14,6 +14,7 @@ const usersSchema = new Schema(
     provider_uid: String,
     mobileNumber: String,
     picture: String,
+    wishlist: [],
     isRegistered: {
       type: Boolean,
       default: false,

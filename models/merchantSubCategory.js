@@ -7,6 +7,7 @@ const merchantSubCategorySchema = new Schema(
   {
     name: String,
     merchantId: String,
+    categoryId: String,
     isVerified: {
       type: Boolean,
       default: false,
