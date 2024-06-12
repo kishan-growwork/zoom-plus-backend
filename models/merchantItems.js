@@ -8,13 +8,13 @@ const merchantItemsSchema = new Schema(
     merchantId: String,
     category: {
       type: String,
-      ref: "merchantCategory",
+      ref: "category",
       default: "none",
     },
     subs: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "subCategory",
       default: "none",
-      ref: "merchantSubCategory",
     },
     images: {
       type: Array,
@@ -56,6 +56,7 @@ const merchantItemsSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    userId: String,
     isActive: {
       type: Boolean,
       default: false,

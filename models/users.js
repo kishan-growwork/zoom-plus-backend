@@ -7,7 +7,12 @@ const usersSchema = new Schema(
   {
     firstName: String,
     lastName: String,
-    email: { type: String, unique: true },
+    // email: { type: String, unique: true },
+    email: {
+      type: String,
+      unique: [true, "Email should be uniuqe"],
+      required: [true, "Email is required"],
+    },
     password: { type: String },
     roleId: String,
     provider: String,

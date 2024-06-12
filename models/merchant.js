@@ -5,8 +5,12 @@ const model = mongoose.model;
 
 const merchantSchema = new Schema(
   {
+    step: {
+      type: Number,
+      default: 0,
+    },
     restaurantId: String,
-    userId: String,
+    userId: Schema.Types.ObjectId,
     logo: String,
     images: {
       type: Array,
@@ -17,7 +21,35 @@ const merchantSchema = new Schema(
     menuImages: {
       type: Array,
     },
+    restaurantImages: {
+      type: Array,
+    },
+    foodImages: {
+      type: Array,
+    },
     name: String,
+    restAndDeliveryTimeSame: String,
+    gstName: String,
+    gstNumber: String,
+    acNumber: String,
+    reAcNumber: String,
+    acName: String,
+    acType: String,
+    ifscCode: String,
+    fssaiNumber: String,
+    fssaiExpireDate: Date,
+    fssaiImage: Array,
+    gstImage: Array,
+    restaurantType: Array,
+    categories: Array,
+    acNumber: String,
+    openingHours: Array,
+    daysOpen: Array,
+    openingHours: Array,
+    openingHours: Array,
+    panCardName: String,
+    panCardNumber: String,
+    panCardImage: Array,
     address: String,
     lat: String,
     long: String,
@@ -28,7 +60,6 @@ const merchantSchema = new Schema(
     city: String,
     cityCode: String,
     pincode: String,
-
     restaurantMobileNo: String,
     restaurantMobileNoVerified: {
       type: Boolean,

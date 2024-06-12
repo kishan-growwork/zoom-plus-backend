@@ -1,7 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Role = require("../../models/role");
 const { successResponse, errorResponse } = require("../../helper/helper");
-const { ObjectId } = require("mongodb");
 
 exports.createRole = async (req, res) => {
   const data = req.body;

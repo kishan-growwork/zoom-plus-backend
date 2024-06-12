@@ -44,9 +44,6 @@ exports.createCategory = async (req, res) => {
 exports.getAllCategories = async (req, res) => {
   try {
     let results = await Category.find({});
-    console.log("-------------------");
-    console.log("result", results);
-    console.log("-------------------");
     successResponse(
       res,
       {

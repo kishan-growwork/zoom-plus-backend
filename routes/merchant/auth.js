@@ -10,6 +10,7 @@ const {
   me,
   registerUserGoogle,
   checkIsRegisterGoogleUser,
+  selectedmerchant,
 } = require("../../controllers/merchant/auth");
 const { validate } = require("../../helper/helper");
 const { body } = require("express-validator");
@@ -21,11 +22,20 @@ router.post(
   validate([body("mobileNumber").isLength({ min: 10 })]),
   signInOtp
 );
+
 router.post(
   "/auth/verifyOtp",
   validate([body("id").exists(), body("otp").isLength({ min: 4, max: 4 })]),
   verifyOtp
 );
+
+router.post(
+  "/auth/selectedMerchant",
+  validate([body("merchantid").isLength({ min: 2 })]),
+  verifyAuth,
+  selectedmerchant
+);
+
 router.post(
   "/auth/registerUser",
   validate([
@@ -38,12 +48,14 @@ router.post(
   verifyAuth,
   registerUser
 );
+
 router.post(
   "/auth/registerUserGoogle",
   validate([body("mobileNumber").exists()]),
   verifyGoogleUser,
   registerUserGoogle
 );
+
 router.get(
   "/auth/checkIsRegisterGoogleUser",
   verifyGoogleUser,

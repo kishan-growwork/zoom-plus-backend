@@ -15,6 +15,7 @@ mongoose
     console.info("-------------------------------");
     console.info("err => ", err);
     console.info("-------------------------------");
+    console.log("Db connection failed");
   });
 
 const app = express();
@@ -22,6 +23,7 @@ const app = express();
 app.use(cors());
 
 app.use(bodyParser.json());
+
 app.use(
   bodyParser.urlencoded({
     extended: true,

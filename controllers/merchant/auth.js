@@ -10,6 +10,7 @@ const Users = require("../../models/users");
 const { getRoleIdByName } = require("../admin/role");
 const jwt = require("jsonwebtoken");
 const { phone } = require("phone");
+const Merchants = require("../../models/merchant");
 
 exports.signInOtp = async (req, res) => {
   try {
@@ -34,13 +35,9 @@ exports.signInOtp = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
   try {
     const { id, otp } = req?.body;
-
     let findOtp = await OTP.findOne({ _id: id, otp: otp });
     if (findOtp) {
-      let resData = await OTP.findOneAndUpdate(
-        { _id: id },
-        { isVerified: true }
-      );
+      await OTP.updateOne({ _id: id }, { $set: { isVerified: true } });
       let findRole = await getRoleIdByName("merchant");
       if (findRole.status) {
         let findExistUser = await Users.findOne({
@@ -104,6 +101,73 @@ exports.verifyOtp = async (req, res) => {
     console.log("err", err);
     console.log("-------------------");
     errorResponse(res, {}, "OTP not verified yet. Please try again later");
+  }
+};
+
+exports.selectedmerchant = async (req, res) => {
+  try {
+    const { merchantid } = req.body;
+    const user = req.user;
+    // Ensure merchantid and user are provided
+    let userData = await Users.findById(user.uid);
+    if (!userData) {
+      return errorResponse(res, {}, "User not found");
+    }
+    const merchant = await Merchants.findById(merchantid);
+    if (!merchant) {
+      return errorResponse(res, {}, "Merchant not found");
+    }
+    let jwtData = {
+      uid: userData.uid,
+      merchant: merchant,
+    };
+    jwt.sign(
+      jwtData,
+      process.env.SECRET,
+      { expiresIn: process.env.EXPIRES_IN },
+      (err, token) => {
+        if (err) {
+          console.log("-------------------");
+          console.log("Error generating token", err);
+          console.log("-------------------");
+          return errorResponse(res, {}, "Error generating token");
+        } else {
+          jwt.sign(
+            jwtData,
+            process.env.SECRET,
+            { expiresIn: process.env.RE_EXPIRES_IN },
+            (err1, refresh_token) => {
+              if (err1) {
+                console.log("-------------------");
+                console.log("Error generating refresh token", err1);
+                console.log("-------------------");
+                return errorResponse(res, {}, "Error generating refresh token");
+              } else {
+                return successResponse(
+                  res,
+                  {
+                    token,
+                    refresh_token,
+                    user: userData,
+                    merchant: merchant,
+                  },
+                  "Merchant selected Successfully"
+                );
+              }
+            }
+          );
+        }
+      }
+    );
+  } catch (err) {
+    console.log("-------------------");
+    console.log("Error", err);
+    console.log("-------------------");
+    return errorResponse(
+      res,
+      {},
+      "Failed to process request. Please try again later"
+    );
   }
 };
 

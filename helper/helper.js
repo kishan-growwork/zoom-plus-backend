@@ -46,7 +46,7 @@ exports.errorResponse = (
   errors = [],
   code = StatusCodes.BAD_GATEWAY
 ) => {
-  response.status(code).json({
+  response?.status(code).json({
     info: { code, errors: errors, isSuccess: false, message },
     data: { ...data },
   });

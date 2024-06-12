@@ -16,7 +16,6 @@ const merchantDocumentSchema = new Schema(
     fssaiNumber: String,
     fssaiExpireDate: String,
     fssaiLink: String,
-
     bankAccountNumber: String,
     accountType: String,
     bankIFSCCode: String,
