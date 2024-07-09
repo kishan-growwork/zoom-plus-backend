@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const {
   successResponse,
   errorResponse,
@@ -69,5 +70,33 @@ exports.getAllSubCategories = async (req, res) => {
       err?.message || {},
       "SubCategory not created yet. Please try again later"
     );
+  }
+};
+
+exports.verifySubCategoryById = async (req, res) => {
+  try {
+    const value = req.body.value;
+    const role = req.user.roleName;
+    if (role !== "admin") {
+      return errorResponse(
+        res,
+        {},
+        "Only admin have authority to verify and unverify"
+      );
+    }
+    const id = req.params.subcategoryid;
+    const resp = await SubCategory.updateOne(
+      { isDeleted: false, _id: new ObjectId(id) },
+      { $set: { isVerified: value } }
+    );
+    if (resp.modifiedCount === 0) {
+      return errorResponse(res, {}, "No SubCategory found or update failed");
+    }
+    successResponse(res, { data: resp }, "SubCategory verified successfully");
+  } catch (error) {
+    console.info("-------------------------------");
+    console.info("error => ", error);
+    console.info("-------------------------------");
+    errorResponse(res, {}, "Failed to update the data. Please try again later");
   }
 };

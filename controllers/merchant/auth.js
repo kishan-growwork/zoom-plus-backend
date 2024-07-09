@@ -77,6 +77,7 @@ exports.verifyOtp = async (req, res) => {
                     console.log("ref Error", err1);
                     console.log("-------------------");
                   } else {
+                    console.log("Someone put there opt");
                     successResponse(
                       res,
                       {
@@ -108,18 +109,19 @@ exports.selectedmerchant = async (req, res) => {
   try {
     const { merchantid } = req.body;
     const user = req.user;
-    // Ensure merchantid and user are provided
     let userData = await Users.findById(user.uid);
     if (!userData) {
       return errorResponse(res, {}, "User not found");
     }
-    const merchant = await Merchants.findById(merchantid);
-    if (!merchant) {
+    const Merchantobject = await Merchants.findById(merchantid);
+    if (!Merchantobject) {
       return errorResponse(res, {}, "Merchant not found");
     }
     let jwtData = {
       uid: userData.uid,
-      merchant: merchant,
+      merchant: {
+        _id: Merchantobject._id,
+      },
     };
     jwt.sign(
       jwtData,
@@ -149,7 +151,7 @@ exports.selectedmerchant = async (req, res) => {
                     token,
                     refresh_token,
                     user: userData,
-                    merchant: merchant,
+                    merchant: Merchantobject,
                   },
                   "Merchant selected Successfully"
                 );

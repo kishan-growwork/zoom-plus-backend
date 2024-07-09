@@ -3,16 +3,17 @@ const { body, param } = require("express-validator");
 const { validate } = require("../../helper/helper");
 const { verifyAuth } = require("../../middleware/auth");
 const {
-  createCategory,
+  createCategoryForMerchant,
   deleteCategory,
+  getCategoryByMerchantId,
+  getSubCategoryById,
   updateCategory,
-  getCategory,
-} = require("../../controllers/merchant/category");
+} = require("../../controllers/merchant/Merchantcategory");
 
 const router = require("express").Router();
 
 router.post(
-  "/category/create",
+  "/merchantcategory/create",
   validate([
     body()
       .custom((value) => {
@@ -21,23 +22,34 @@ router.post(
       .withMessage("Body cannot be empty"),
   ]),
   verifyAuth,
-  createCategory
+  createCategoryForMerchant
 );
 
 router.delete(
-  "/category/delete/:id",
+  "/merchantcategory/delete/:id",
   validate([param("id").isLength({ min: 2 })]),
   verifyAuth,
   deleteCategory
 );
 
 router.put(
-  "/category/update/:id",
+  "/merchantcategory/update/:id",
   validate([param("id").isLength({ min: 2 })]),
   verifyAuth,
   updateCategory
 );
 
-router.get("/category/get", verifyAuth, getCategory);
+router.get(
+  "/merchantcategory/getsubcategory/:categoryId",
+  validate([param("categoryId").isLength({ min: 2 })]),
+  verifyAuth,
+  getSubCategoryById
+);
+
+router.get(
+  "/merchantcategory/getbymerchantid",
+  verifyAuth,
+  getCategoryByMerchantId
+);
 
 module.exports = router;

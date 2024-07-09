@@ -18,7 +18,7 @@ exports.getMerchantsItem = async (req, res) => {
 
 exports.VerifyMerchantItem = async (req, res) => {
   try {
-    const value = req.body.value;
+    const { comments, value } = req.body;
     const role = req.user.roleName;
     if (role !== "admin") {
       return errorResponse(
@@ -30,7 +30,7 @@ exports.VerifyMerchantItem = async (req, res) => {
     const id = req.params.merchantitemid;
     const resp = await MerchantItems.updateOne(
       { isDeleted: false, _id: new ObjectId(id) },
-      { $set: { isVerified: value } }
+      { $set: { isVerified: value, comments: comments } }
     );
     if (resp.modifiedCount === 0) {
       return errorResponse(res, {}, "No merchant found or update failed");

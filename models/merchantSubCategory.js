@@ -8,9 +8,10 @@ const merchantSubCategorySchema = new Schema(
     name: String,
     merchantId: String,
     categoryId: String,
+    comments: { type: String, default: null },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: null,
     },
     isDeleted: {
       type: Boolean,

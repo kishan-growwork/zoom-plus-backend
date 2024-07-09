@@ -6,10 +6,11 @@ const model = mongoose.model;
 const subCategorySchema = new Schema(
   {
     name: { type: String, required: true },
-    // s3Key: String,
-    // s3Bucket: String,
-    merchantId: String,
+    s3Key: String,
+    s3Bucket: String,
+    merchantId: Schema.Types.ObjectId,
     categoryId: Schema.Types.ObjectId,
+    comments: { type: String, default: null },
     isActive: {
       type: Boolean,
       default: true,

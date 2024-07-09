@@ -15,6 +15,7 @@ const otp = new Schema(
       type: Boolean,
       default: false,
     },
+    
   },
   {
     collection: "otp",

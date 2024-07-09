@@ -138,9 +138,9 @@ exports.verifyGoogleUser = async (req, res, next) => {
             audience: [client1, client2, client3],
           });
           const payload = ticket.getPayload();
-          console.log("-------------------");
+
           console.log("payload", payload);
-          console.log("-------------------");
+
           if (payload?.email && payload?.email_verified) {
             req.user = payload;
             next();

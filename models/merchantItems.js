@@ -5,26 +5,24 @@ const model = mongoose.model;
 const merchantItemsSchema = new Schema(
   {
     name: { type: String, required: true },
-    merchantId: String,
+    merchantId: Schema.Types.ObjectId,
     category: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "category",
-      default: "none",
     },
     subs: {
       type: Schema.Types.ObjectId,
       ref: "subCategory",
-      default: "none",
     },
     images: {
       type: Array,
     },
     isVeg: {
-      type: Number,
+      type: Array,
       required: true,
-      default: 0,
       //0:vegeterian 1:Non-vegeterian 2:Both
     },
+    comments: { type: String, default: null },
     extras: [],
     additionalInfo: String,
     isEligibleCoupon: {
@@ -36,7 +34,7 @@ const merchantItemsSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    timeSlots: [],
+    timeSlots: [], //[{from:date to:farw},{}]
     availableDays: [], // 0:Monday,1:TuesDay,2:wednesday,3:thursday,4:friday,5:saturday,6:sunday
     isSpicy: {
       type: Boolean,
@@ -44,7 +42,7 @@ const merchantItemsSchema = new Schema(
     },
     inStock: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     price: {
       type: Number,
@@ -54,7 +52,7 @@ const merchantItemsSchema = new Schema(
     },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: null,
     },
     userId: String,
     isActive: {

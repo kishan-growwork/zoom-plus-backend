@@ -11,7 +11,7 @@ const router = require("express").Router();
 
 router.post(
   "/verifymerchant/:merchantid",
-  validate([param("merchantid").exists(), body("value").exists()]),
+  validate([param("merchantid").exists()]),
   verifyAuth,
   verifyMerchantById
 );

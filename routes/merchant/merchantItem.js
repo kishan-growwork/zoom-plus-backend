@@ -7,6 +7,7 @@ const {
   deleteMerchantItem,
   updateMerchantItem,
   updateMerchantItemStock,
+  getOneMerchantItem,
 } = require("../../controllers/merchant/merchantItems");
 const { verifyAuth } = require("../../middleware/auth");
 
@@ -17,21 +18,16 @@ router.post(
   validate([
     body("name").isLength({ min: 2 }),
     body("isVeg").exists(),
-    body("isEligibleCoupon").exists(),
+    // body("isEligibleCoupon").exists(),
     body("price").exists(),
-    body("merchantId").exists(),
     body("category").exists(),
   ]),
   verifyAuth,
   createMerchantItems
 );
 
-router.get(
-  "/merchantItem/get/:id",
-  validate([param("id").exists()]),
-  verifyAuth,
-  getMerchantsItem
-);
+router.get("/merchantItem/get", verifyAuth, getMerchantsItem);
+router.get("/merchantItem/get/:itemId", verifyAuth, getOneMerchantItem);
 
 router.delete(
   "/merchantItem/delete/:id",
@@ -41,15 +37,15 @@ router.delete(
 );
 
 router.put(
-  "/merchantItem/update/:id",
-  validate([param("id").exists()]),
+  "/merchantItem/update/:itemId",
+  validate([param("itemId").exists()]),
   verifyAuth,
   updateMerchantItem
 );
 
 router.post(
   "/merchantItem/updateStock/:id",
-  validate([param("id").exists(), body("isStock").exists()]),
+  validate([param("id").exists(), body("inStock").exists()]),
   verifyAuth,
   updateMerchantItemStock
 );

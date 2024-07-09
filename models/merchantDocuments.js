@@ -21,7 +21,6 @@ const merchantDocumentSchema = new Schema(
     bankIFSCCode: String,
     beneficiaryName: String,
     bankcancelCheque: String,
-
     isDeleted: {
       type: Boolean,
       default: false,

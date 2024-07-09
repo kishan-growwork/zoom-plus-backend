@@ -8,11 +8,11 @@ const awsAccessKey = process.env.AWS_S3_ACCESS_KEY;
 const awsSecretKey = process.env.AWS_S3_SECRET_KEY;
 
 exports.uploadS3Api = async (req, res) => {
-  const { file } = req.files;
+  const file = req?.files?.file;
+  if (!file) {
+    return errorResponse(res, {}, "No file provided");
+  }
   try {
-    if (!file) {
-      return errorResponse(res, {}, "No file provided");
-    }
     const s3 = new S3({
       region: awsRegion,
       accessKeyId: awsAccessKey,

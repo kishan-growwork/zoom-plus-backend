@@ -3,14 +3,19 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const model = mongoose.model;
 
-const merchantCategorySchema = new Schema(
+const discountSchema = new Schema(
   {
-    name: String,
+    createdBy: Schema.Types.ObjectId,
     merchantId: Schema.Types.ObjectId,
-    comments: { type: String, default: null },
-    isVerified: {
+    totalPercentage: Number,
+    flatDiscountRs: Number,
+    flatDiscount: {
       type: Boolean,
-      default: null,
+      default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
     },
     isDeleted: {
       type: Boolean,
@@ -18,7 +23,7 @@ const merchantCategorySchema = new Schema(
     },
   },
   {
-    collection: "merchantCategory",
+    collection: "discount",
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
     timestamps: true,
@@ -26,5 +31,5 @@ const merchantCategorySchema = new Schema(
   }
 );
 
-const MerchantCategory = model("merchantCategory", merchantCategorySchema);
-module.exports = MerchantCategory;
+const Discount = model("discount", discountSchema);
+module.exports = Discount;

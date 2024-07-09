@@ -7,7 +7,6 @@ const categorySchema = new Schema(
   {
     name: { type: String, required: true },
     image: String,
-    merchantId: String,
     s3Key: String,
     s3Bucket: String,
     isActive: {
@@ -17,6 +16,10 @@ const categorySchema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: null,
     },
   },
   {

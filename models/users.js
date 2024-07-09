@@ -19,14 +19,16 @@ const usersSchema = new Schema(
     provider_uid: String,
     mobileNumber: String,
     picture: String,
-    wishlist: [],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId }],
+    merchantlist: [{ type: mongoose.Schema.Types.ObjectId }],
+    cartId: { type: mongoose.Schema.Types.ObjectId },
     isRegistered: {
       type: Boolean,
       default: false,
     },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: null,
     },
     isDeleted: {
       type: Boolean,

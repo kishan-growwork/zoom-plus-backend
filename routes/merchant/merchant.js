@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+const { body, param, query } = require("express-validator");
 
 const { validate } = require("../../helper/helper");
 const {
@@ -21,7 +21,9 @@ router.post(
         return Object.keys(value).length > 0;
       })
       .withMessage("Body cannot be empty"),
+    query("step").exists(),
   ]),
+  verifyAuth,
   createMerchant
 );
 

@@ -4,7 +4,7 @@ const { ObjectId } = require("mongodb");
 
 exports.verifyMerchantById = async (req, res) => {
   try {
-    const value = req.body.value;
+    const data = req.body;
     const role = req.user.roleName;
     if (role !== "admin") {
       return errorResponse(
@@ -13,10 +13,16 @@ exports.verifyMerchantById = async (req, res) => {
         "Only admin have authority to verify and unverify"
       );
     }
-    const id = req.params.id;
+    const id = req.params.merchantid;
+
+    const updateFields = {};
+    for (const [key, value] of Object.entries(data)) {
+      updateFields[key] = value;
+    }
+
     const resp = await Merchants.updateOne(
       { isDeleted: false, _id: new ObjectId(id) },
-      { $set: { isVerified: value } }
+      { $set: { ...data } }
     );
     if (resp.modifiedCount === 0) {
       return errorResponse(res, {}, "No merchant found or update failed");
@@ -34,7 +40,7 @@ exports.getAllMerchantForAdmin = async (req, res) => {
   try {
     const resp = await Merchants.aggregate([
       {
-        $match: { isDeleted: false, isVerified: false },
+        $match: { isDeleted: false, isVerified: true },
       },
       {
         $lookup: {

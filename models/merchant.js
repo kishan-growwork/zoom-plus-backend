@@ -10,49 +10,107 @@ const merchantSchema = new Schema(
       default: 0,
     },
     restaurantId: String,
-    userId: Schema.Types.ObjectId,
-    logo: String,
-    images: {
-      type: Array,
-    },
-    foodImages: {
-      type: Array,
-    },
-    menuImages: {
-      type: Array,
+    restaurantBasicInfo: {
+      name: String,
+      address: String,
+      latitude: String,
+      longitude: String,
+      mobile: String,
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+      comments: { type: String, default: null },
     },
     restaurantImages: {
-      type: Array,
+      images: {
+        type: Array,
+      },
+      foodImages: {
+        type: Array,
+      },
+      menuImages: {
+        type: Array,
+      },
+      restaurantImages: {
+        type: Array,
+      },
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+      comments: { type: String, default: null },
     },
-    foodImages: {
-      type: Array,
+    restaurantDetails: {
+      restaurantType: Array,
+      openingHours: Array,
+      restopeningHours: Object,
+      daysOpen: Array,
+      restdaysOpen: Array,
+      restAndDeliveryTimeSame: String,
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+      comments: { type: String, default: null },
     },
-    name: String,
-    restAndDeliveryTimeSame: String,
-    gstName: String,
-    gstNumber: String,
-    acNumber: String,
+    discount: String,
+    userId: Schema.Types.ObjectId,
+    logo: String,
+    gstDetails: {
+      gstName: String,
+      gstNumber: String,
+      gstImage: Array,
+      isVerified: { type: Boolean, default: null },
+      comments: { type: String, default: null },
+    },
     reAcNumber: String,
-    acName: String,
-    acType: String,
-    ifscCode: String,
-    fssaiNumber: String,
-    fssaiExpireDate: Date,
-    fssaiImage: Array,
-    gstImage: Array,
-    restaurantType: Array,
     categories: Array,
-    acNumber: String,
-    openingHours: Array,
-    daysOpen: Array,
-    openingHours: Array,
-    openingHours: Array,
-    panCardName: String,
-    panCardNumber: String,
-    panCardImage: Array,
-    address: String,
-    lat: String,
-    long: String,
+    isVeg: {
+      type: Number,
+      required: true,
+      default: 0,
+      //0:vegeterian 1:Non-vegeterian 2:Both
+    },
+    panDetails: {
+      panCardName: String,
+      panCardNumber: String,
+      panCardImage: Array,
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+      comments: { type: String, default: null },
+    },
+    userVerification: {
+      comments: { type: String, default: null },
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+    },
+    bankDetails: {
+      accountType: String,
+      acName: String,
+      acType: String,
+      acNumber: String,
+      ifscCode: String,
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+      comments: { type: String, default: null },
+    },
+    fssaiDetails: {
+      fssaiNumber: String,
+      fssaiExpireDate: Date,
+      fssaiImage: Array,
+      isVerified: {
+        type: Boolean,
+        default: null,
+      },
+      comments: { type: String, default: null },
+    },
     country: String,
     countryCode: String,
     state: String,
@@ -111,6 +169,15 @@ const merchantSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+      },
+      coordinates: {
+        type: [Number],
+      },
+    },
   },
   {
     collection: "merchants",
@@ -120,6 +187,7 @@ const merchantSchema = new Schema(
     versionKey: false,
   }
 );
+merchantSchema.index({ location: "2dsphere" });
 
 merchantSchema.virtual("role", {
   ref: "role",

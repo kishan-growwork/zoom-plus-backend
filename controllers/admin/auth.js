@@ -21,7 +21,7 @@ exports.signIn = async (req, res) => {
           tokenType: "token",
           uid: adminUser.id,
           roleId: adminUser.roleId,
-          roleName: adminUser.name,
+          roleName: getAdminRole.name,
           firstName: adminUser.firstName,
           lastName: adminUser.lastName,
         };

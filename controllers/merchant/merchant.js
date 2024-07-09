@@ -9,10 +9,9 @@ const { ObjectId } = require("mongodb");
 
 exports.createMerchant = async (req, res) => {
   const data = req.body;
-  const step = Number(req.query.step);
   let logoURL = null;
-  let menuImages = null;
   let images = [];
+  const step = Number(req?.query?.step);
 
   if (step && ![1, 2, 3, 4, 5].includes(step)) {
     return errorResponse(
@@ -21,94 +20,227 @@ exports.createMerchant = async (req, res) => {
       "Invalid step value. Must be one of [1, 2, 3, 4, 5]"
     );
   }
+  const missingFields = [];
 
-  if (
-    step == 1 &&
-    (!data.name ||
-      !data.address ||
-      !data.latitude ||
-      !data.longitude ||
-      !data.mobile)
-  ) {
-    return errorResponse(res, {}, "Not valid input");
-  } else if (
-    step == 2 &&
-    (data.restaurantType.length == 0 ||
-      data.categories.length == 0 ||
-      data.openingHours.length == 0 ||
-      data.daysOpen.length == 0)
-  ) {
-    return errorResponse(res, {}, "Not valid input");
-  } else if (
-    step == 3 &&
-    (data.menuImages.length == 0 ||
-      data.restaurantImages.length == 0 ||
-      data.foodImages.length == 0)
-  ) {
-    return errorResponse(res, {}, "Not valid input");
-  } else if (step == 4) {
-    if (!data.restAndDeliveryTimeSame || !data.openingHours || !data.daysOpen) {
-      return errorResponse(res, {}, "Not valid input");
-    }
-  } else if (
-    step == 5 &&
-    (!data.panCardName ||
-      !data.panCardNumber ||
-      data.panCardImage.length == 0 ||
-      !data.gstName ||
-      !data.gstNumber ||
-      data.gstImage.length == 0 ||
-      !data.acNumber ||
-      !data.reAcNumber ||
-      !data.acName ||
-      !data.ifscCode ||
-      !data.fssaiNumber ||
-      !data.fssaiExpireDate ||
-      data.fssaiImage.length == 0)
-  ) {
-    return errorResponse(res, {}, "Not valid input");
-  }
-
-  if (req?.files?.logo) {
-    let uploadImage = await UploadS3(
-      req.files.logo,
-      `merchants/${req?.body?.restaurantId}`
+  const checkField = (field) => {
+    return (
+      !data[field] ||
+      (typeof data[field] === "string" && data[field].trim() === "") ||
+      (Array.isArray(data[field]) && data[field].length === 0)
     );
-    if (uploadImage.success) {
-      logoURL = uploadImage?.url;
-    }
-  }
-  if (req?.files?.images?.length) {
-    for (let index = 0; index < req?.files?.images.length; index++) {
-      const item = req?.files?.images[index];
-      let uploadImage = await UploadS3(
-        item,
-        `merchants/${req?.body?.restaurantId}`
-      );
-      if (uploadImage.success) {
-        images.push(uploadImage?.url);
+  };
+
+  if (step === 1) {
+    const requiredFields = [
+      "name",
+      "address",
+      "latitude",
+      "longitude",
+      "mobile",
+    ];
+    requiredFields.forEach((field) => {
+      if (checkField(field)) {
+        missingFields.push(field);
       }
+    });
+    if (missingFields.length > 0) {
+      return errorResponse(
+        res,
+        { missingFields },
+        `Missing or empty fields for step 1: ${missingFields.join(", ")}`
+      );
+    }
+  } else if (step === 2) {
+    const requiredFields = [
+      "restaurantType",
+      "categories",
+      "openingHours",
+      "daysOpen",
+      // "isVeg",
+    ];
+    requiredFields.forEach((field) => {
+      if (checkField(field)) {
+        missingFields.push(field);
+      }
+    });
+    if (missingFields.length > 0) {
+      return errorResponse(
+        res,
+        { missingFields },
+        `Missing or empty fields for step 2: ${missingFields.join(", ")}`
+      );
+    }
+  } else if (step === 3) {
+    const requiredFields = ["menuImages", "restaurantImages", "foodImages"];
+    requiredFields.forEach((field) => {
+      if (checkField(field)) {
+        missingFields.push(field);
+      }
+    });
+    if (missingFields.length > 0) {
+      return errorResponse(
+        res,
+        { missingFields },
+        `Missing or empty fields for step 3: ${missingFields.join(", ")}`
+      );
+    }
+  } else if (step === 4) {
+    const requiredFields = [
+      "restAndDeliveryTimeSame",
+      "restopeningHours",
+      "restdaysOpen",
+    ];
+    requiredFields.forEach((field) => {
+      if (checkField(field)) {
+        missingFields.push(field);
+      }
+    });
+    if (missingFields.length > 0) {
+      return errorResponse(
+        res,
+        { missingFields },
+        `Missing or empty fields for step 4: ${missingFields.join(", ")}`
+      );
+    }
+  } else if (step === 5) {
+    const requiredFields = [
+      "panCardName",
+      "panCardNumber",
+      "panCardImage",
+      "gstName",
+      "gstNumber",
+      "gstImage",
+      "acNumber",
+      "reAcNumber",
+      "acName",
+      "ifscCode",
+      "fssaiNumber",
+      "accountType",
+      "fssaiExpireDate",
+      "fssaiImage",
+    ];
+    requiredFields.forEach((field) => {
+      if (checkField(field)) {
+        missingFields.push(field);
+      }
+    });
+    if (missingFields.length > 0) {
+      return errorResponse(
+        res,
+        { missingFields },
+        `Missing or empty fields for step 5: ${missingFields.join(", ")}`
+      );
     }
   }
-  if (req?.files?.menuImages) {
-    let uploadImage = await UploadS3(
-      req.files.menuImages,
-      `merchants/${req?.body?.restaurantId}`
-    );
-    if (uploadImage.success) {
-      menuImages = uploadImage?.url;
-    }
+
+  const merchantData = {};
+  let location = {};
+  if (step === 1) {
+    merchantData.restaurantBasicInfo = {
+      name: data.name,
+      address: data.address,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      mobile: data.mobile,
+      // isVerified: null,
+    };
+    location = {
+      location: {
+        type: "Point",
+        coordinates: [data.longitude, data.latitude],
+      },
+    };
+  } else if (step === 2) {
+    merchantData.restaurantDetails = {
+      restaurantType: data.restaurantType,
+      categories: data.categories,
+      openingHours: data.openingHours,
+      daysOpen: data.daysOpen,
+      isVerified: null,
+    };
+    // merchantData.isVeg = data.isVeg;
+  } else if (step === 3) {
+    merchantData.restaurantImages = {
+      menuImages: data.menuImages,
+      restaurantImages: data.restaurantImages,
+      foodImages: data.foodImages,
+      isVerified: null,
+    };
+  } else if (step === 4) {
+    merchantData.restaurantDetails = {
+      ...merchantData.restaurantDetails,
+      restAndDeliveryTimeSame: data.restAndDeliveryTimeSame,
+      restopeningHours: data.restopeningHours,
+      restdaysOpen: data.restdaysOpen,
+      isVerified: null,
+    };
+  } else if (step === 5) {
+    merchantData.panDetails = {
+      panCardName: data.panCardName,
+      panCardNumber: data.panCardNumber,
+      panCardImage: data.panCardImage,
+      isVerified: null,
+    };
+    merchantData.gstDetails = {
+      gstName: data.gstName,
+      gstNumber: data.gstNumber,
+      gstImage: data.gstImage,
+      isVerified: null,
+    };
+    merchantData.bankDetails = {
+      accountType: data.accountType,
+      acName: data.acName,
+      acNumber: data.acNumber,
+      ifscCode: data.ifscCode,
+      isVerified: null,
+    };
+    merchantData.fssaiDetails = {
+      fssaiNumber: data.fssaiNumber,
+      fssaiExpireDate: data.fssaiExpireDate,
+      fssaiImage: data.fssaiImage,
+      isVerified: null,
+    };
+    merchantData.reAcNumber = data.reAcNumber;
   }
+  // if (req?.files?.logo) {
+  //   let uploadImage = await UploadS3(
+  //     req.files.logo,
+  //     `merchants/${req?.body?.restaurantId}`
+  //   );
+  //   if (uploadImage.success) {
+  //     logoURL = uploadImage?.url;
+  //   }
+  // }
+  // if (req?.files?.images?.length) {
+  //   for (let index = 0; index < req?.files?.images.length; index++) {
+  //     const item = req?.files?.images[index];
+  //     let uploadImage = await UploadS3(
+  //       item,
+  //       `merchants/${req?.body?.restaurantId}`
+  //     );
+  //     if (uploadImage.success) {
+  //       images.push(uploadImage?.url);
+  //     }
+  //   }
+  // }
+  // if (req?.files?.menuImages) {
+  //   let uploadImage = await UploadS3(
+  //     req.files.menuImages,
+  //     `merchants/${req?.body?.restaurantId}`
+  //   );
+  //   if (uploadImage.success) {
+  //     menuImages = uploadImage?.url;
+  //   }
+  // }
 
   const objectId = new mongoose.Types.ObjectId();
+
   await Merchants.findOneAndUpdate(
     { _id: data?.id ?? objectId },
     {
-      ...data,
+      ...merchantData,
+      ...location,
       step: step,
-      images: images,
-      menuImages,
-      logo: logoURL,
       userId: req?.user?.uid,
     },
     { upsert: true, new: true, setDefaultsOnInsert: true }
@@ -120,7 +252,7 @@ exports.createMerchant = async (req, res) => {
       console.info("err => ", err);
       errorResponse(
         res,
-        {},
+        { err },
         "Merchant not created yet. Please try again later"
       );
     });
@@ -149,7 +281,7 @@ exports.getMerchantById = async (req, res) => {
       // },
       {
         $lookup: {
-          from: "category",
+          from: "merchantCategory",
           localField: "category",
           foreignField: "_id",
           as: "merchantCategory",
@@ -290,8 +422,18 @@ exports.getAllMerchant = async (req, res) => {
 exports.getAllmerchantsForOutlets = async (req, res) => {
   try {
     const user = req.user;
-    const resp = await Merchants.find({ userId: user.uid }).select("_id name");
-    successResponse(res, { data: resp }, "Merchant Fetch successfully");
+    const resp = await Merchants.find({ userId: user?.uid }).select(
+      "_id restaurantBasicInfo.name"
+    );
+    const transformedResp = resp.map((item) => ({
+      _id: item?._id,
+      name: item?.restaurantBasicInfo?.name,
+    }));
+    successResponse(
+      res,
+      { data: transformedResp },
+      "Merchant Fetch successfully"
+    );
   } catch (error) {
     console.info("-------------------------------");
     console.info("error => ", error);
@@ -299,3 +441,16 @@ exports.getAllmerchantsForOutlets = async (req, res) => {
     errorResponse(res, {}, "Failed to fetch the data. Please try again later");
   }
 };
+
+// exports.addDiscountForAllTheItems = async (req, res) => {
+//   try {
+//     const user = req.user;
+//     const resp = await Merchants.find({ userId: user?.uid }).select("_id name");
+//     successResponse(res, { data: resp }, "Merchant Fetch successfully");
+//   } catch (error) {
+//     console.info("-------------------------------");
+//     console.info("error => ", error);
+//     console.info("-------------------------------");
+//     errorResponse(res, {}, "Failed to fetch the data. Please try again later");
+//   }
+// };
